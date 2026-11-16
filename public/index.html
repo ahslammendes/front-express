@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consulta de Data e Hora - API Express</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <section class="card" aria-labelledby="page-title">
+      <header class="card-header">
+        <div>
+          <p class="eyebrow">Express API + Frontend</p>
+          <h1 id="page-title">Consulta de Data e Hora</h1>
+        </div>
+        <span id="status-badge" class="badge badge--loading" role="status" aria-live="polite">
+          Consultando...
+        </span>
+      </header>
+
+      <section class="clock-panel" aria-label="Data e hora retornadas pela API">
+        <div id="hora" class="clock-time">--:--:--</div>
+        <div class="clock-date-row">
+          <span id="data" class="clock-date">--/--/----</span>
+          <span class="separator" aria-hidden="true">&bull;</span>
+          <span id="dia-semana" class="clock-weekday">---</span>
+        </div>
+      </section>
+
+      <section class="meta-grid" aria-label="Metadados da resposta">
+        <div class="meta-item">
+          <span class="meta-label">Fuso Horário</span>
+          <span id="fuso" class="meta-value">---</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">ISO 8601 (UTC)</span>
+          <span id="iso" class="meta-value mono">---</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Timestamp (ms)</span>
+          <span id="timestamp" class="meta-value mono">---</span>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="Controles da consulta">
+        <div class="endpoint-group">
+          <label for="api-url">URL do endpoint da API</label>
+          <input
+            id="api-url"
+            type="url"
+            placeholder="https://seu-servico.onrender.com/api/datetime"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="actions-row">
+          <button id="btn-fetch" type="button" class="btn-primary">
+            Consultar API Agora
+          </button>
+
+          <label class="toggle-label" for="auto-refresh">
+            <input id="auto-refresh" type="checkbox" checked />
+            <span>Atualizar automaticamente (1s)</span>
+          </label>
+        </div>
+
+        <p id="error-message" class="error-message" hidden role="alert"></p>
+      </section>
+
+      <details class="json-details" open>
+        <summary>Resposta JSON bruta da rota</summary>
+        <pre id="json-output" class="json-output">{}</pre>
+      </details>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
