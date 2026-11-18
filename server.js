@@ -8,7 +8,15 @@ const TIMEZONE = 'America/Sao_Paulo';
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(
+  express.static(path.join(__dirname, 'public'), {
+    etag: false,
+    maxAge: 0,
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    },
+  })
+);
 
 /**
  * Formata a data e hora atual no fuso horário de Brasília (America/Sao_Paulo).
