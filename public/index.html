@@ -1,80 +1,458 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="antialiased">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Consulta de Data e Hora - API Express</title>
+  <title>Consulta de Data e Hora - API Express // Aetheris Design System</title>
+  <link rel="icon" href="assets/aetheris/favicon.ico" />
+  <script src="assets/aetheris/tailwind.js"></script>
+  <link rel="stylesheet" href="assets/aetheris/fonts.css" />
+  <script src="assets/aetheris/tailwind.config.js"></script>
+  <link rel="stylesheet" href="assets/aetheris/aetheris.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  <main class="container">
-    <section class="card" aria-labelledby="page-title">
-      <header class="card-header">
-        <div>
-          <p class="eyebrow">Express API + Frontend</p>
-          <h1 id="page-title">Consulta de Data e Hora</h1>
+<body class="font-body bg-tech-grid grid-bg selection:bg-mint selection:text-void">
+
+  <!-- 1. PRELOADER AETHERIS -->
+  <div class="preloader" id="preloader" role="status" aria-label="Inicializando Sistema">
+    <div class="text-center px-6">
+      <div class="font-display text-3xl md:text-4xl font-semibold mb-2 tracking-tighter text-white">INITIALIZING</div>
+      <div class="w-48 h-1 bg-gray-800 mx-auto overflow-hidden">
+        <div class="h-full bg-mint w-0" id="loader-bar"></div>
+      </div>
+      <div class="font-mono text-[10px] text-mint mt-2 tracking-widest uppercase">ESTABLISHING UPLINK...</div>
+    </div>
+  </div>
+
+  <!-- 2. HUD CORNERS FRAME -->
+  <div class="fixed inset-0 pointer-events-none z-40 p-4 hidden md:block" aria-hidden="true">
+    <div class="absolute top-4 left-4 w-2 h-2 border-t border-l border-white/50"></div>
+    <div class="absolute top-4 right-4 w-2 h-2 border-t border-r border-white/50"></div>
+    <div class="absolute bottom-4 left-4 w-2 h-2 border-b border-l border-white/50"></div>
+    <div class="absolute bottom-4 right-4 w-2 h-2 border-b border-r border-white/50"></div>
+  </div>
+
+  <!-- 3. NAVBAR GLASS -->
+  <nav class="fixed w-full z-50 top-0 border-b border-border bg-void/90 backdrop-blur-xl" aria-label="Navegação Principal">
+    <div class="flex h-16 max-w-[1920px] mx-auto px-6 md:px-12 items-center justify-between">
+      <a href="#relogio" class="flex items-center gap-2.5 group shrink-0" aria-label="Início Aetheris Chrono">
+        <span class="w-2 h-2 bg-mint rounded-sm shadow-[0_0_10px_#00ffa3]"></span>
+        <span class="text-lg font-semibold tracking-tight font-display text-white">AETHERIS</span>
+        <span class="text-[10px] font-mono text-mint uppercase tracking-widest hidden sm:inline">// CHRONO API</span>
+      </a>
+
+      <div class="hidden lg:flex items-center border-x border-border h-full px-8">
+        <a href="#relogio" class="uppercase text-sub hover:text-mint transition-colors text-xs font-semibold tracking-wide py-2 px-6">Relógio</a>
+        <a href="#metricas" class="uppercase text-sub hover:text-mint transition-colors text-xs font-semibold tracking-wide py-2 px-6">Metadados</a>
+        <a href="#telemetria" class="uppercase text-sub hover:text-mint transition-colors text-xs font-semibold tracking-wide py-2 px-6">Telemetria &amp; JSON</a>
+        <a href="#arquitetura" class="uppercase text-sub hover:text-mint transition-colors text-xs font-semibold tracking-wide py-2 px-6">Arquitetura</a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="hidden md:flex items-center gap-2 text-[10px] font-mono text-mint">
+          <span class="w-1.5 h-1.5 bg-mint rounded-full animate-pulse"></span>
+          <span id="nav-latency">PING: --MS</span>
         </div>
         <span id="status-badge" class="badge badge--loading" role="status" aria-live="polite">
           Consultando...
         </span>
-      </header>
+      </div>
+    </div>
+  </nav>
 
-      <section class="clock-panel" aria-label="Data e hora retornadas pela API">
-        <div id="hora" class="clock-time">--:--:--</div>
-        <div class="clock-date-row">
-          <span id="data" class="clock-date">--/--/----</span>
-          <span class="separator" aria-hidden="true">&bull;</span>
-          <span id="dia-semana" class="clock-weekday">---</span>
+  <!-- 4. HERO SECTION + AURORA SCENE + PAINEL PRINCIPAL DE DATA E HORA -->
+  <header id="relogio" class="relative w-full min-h-screen bg-void overflow-hidden flex flex-col items-center justify-end pt-28 pb-16 md:pb-24">
+    <!-- Cena Aurora Ao Vivo (Unicorn Studio) -->
+    <div class="absolute top-0 left-0 w-full h-[60vh] z-0 pointer-events-none">
+      <div data-us-project="7zydvovZReD8YsoiUwj3" data-us-project-src="aetheris-us-scene" style="width: 100%; height: 100%;"></div>
+      <div class="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-void via-void/80 to-transparent z-10"></div>
+    </div>
+
+    <div class="relative z-20 flex flex-col items-center w-full max-w-6xl mx-auto px-6">
+      <!-- Cabeçalho Tipográfico Display + Outlined Stroke -->
+      <div class="flex flex-col items-center justify-center w-full text-center mb-8">
+        <div class="inline-block px-3 py-1 border border-border bg-white/5 rounded-full mb-5 hero-anim opacity-0 translate-y-4">
+          <span class="text-[10px] font-mono text-mint uppercase tracking-widest">Express Node.js API &bull; America/Sao_Paulo</span>
+        </div>
+
+        <h1 id="page-title" class="font-display text-3xl sm:text-5xl md:text-7xl font-semibold text-white tracking-tightest leading-none relative z-20 mix-blend-lighten">
+          DATA &amp; HORA
+        </h1>
+
+        <div class="font-display text-[12vw] leading-[0.82] font-semibold tracking-tighter text-transparent z-10 select-none pointer-events-none text-stroke opacity-90" aria-hidden="true">
+          SYNCHRONIZED
+        </div>
+      </div>
+
+      <!-- Card Console Principal (Superfície Aetheris com Scan Line) -->
+      <section class="w-full border border-border bg-panel/90 backdrop-blur-md p-6 md:p-10 relative overflow-hidden hero-anim opacity-0 translate-y-4" aria-label="Console de Data e Hora em Tempo Real">
+        <div class="scan-line z-10 pointer-events-none"></div>
+
+        <!-- Topo do Console -->
+        <div class="relative z-20 flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-border">
+          <div class="flex items-center gap-3">
+            <span class="text-[9px] bg-mint text-void px-2 py-0.5 font-bold rounded tracking-wider uppercase">LIVE</span>
+            <span class="font-mono text-[10px] text-sub uppercase tracking-widest">ROTA ATIVA: GET /API/DATETIME</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 bg-mint rounded-full animate-pulse shadow-[0_0_8px_#00ffa3]"></span>
+            <span class="font-mono text-[10px] text-mint uppercase tracking-widest">UPLINK ACTIVE</span>
+          </div>
+        </div>
+
+        <!-- Visor Digital de Hora e Data -->
+        <div class="relative z-20 py-10 md:py-12 text-center border-b border-border">
+          <div class="text-[10px] font-mono text-sub uppercase tracking-[0.3em] mb-3">Horário Oficial de Brasília</div>
+          <div id="hora" class="font-mono text-5xl sm:text-7xl md:text-8xl font-bold text-white tracking-tight clock-time-display">
+            --:--:--
+          </div>
+
+          <div class="mt-6 flex flex-wrap items-center justify-center gap-3 md:gap-4">
+            <span class="text-mint font-mono text-sm md:text-base tracking-[0.2em] uppercase bg-black/60 backdrop-blur-md px-4 py-1.5 rounded-full border border-mint/30">
+              <span id="data">--/--/----</span>
+            </span>
+            <span class="text-sub font-mono text-xs" aria-hidden="true">//</span>
+            <span id="dia-semana" class="font-display text-base md:text-lg font-semibold text-white capitalize tracking-tight">
+              ---
+            </span>
+          </div>
+        </div>
+
+        <!-- Controles Interativos da API -->
+        <div class="relative z-20 pt-6 flex flex-col gap-5">
+          <div class="flex flex-col md:flex-row gap-4 items-stretch md:items-end">
+            <div class="flex-1 flex flex-col gap-2">
+              <label for="api-url" class="text-[10px] font-mono text-mint uppercase tracking-widest">
+                Endpoint da API Express
+              </label>
+              <input
+                id="api-url"
+                type="url"
+                class="aetheris-input w-full px-4 py-3 text-xs md:text-sm"
+                placeholder="https://seu-servico.onrender.com/api/datetime"
+                autocomplete="off"
+              />
+            </div>
+
+            <button
+              id="btn-fetch"
+              type="button"
+              class="group bg-mint text-void px-8 py-3.5 text-xs font-semibold uppercase tracking-wide hover:bg-white transition-all hover:scale-[1.02] min-w-[210px] text-center shadow-[0_0_20px_rgba(0,255,163,0.3)] shrink-0"
+            >
+              Consultar API Agora
+            </button>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+            <label for="auto-refresh" class="inline-flex items-center gap-3 cursor-pointer select-none group">
+              <input id="auto-refresh" type="checkbox" checked class="aetheris-checkbox" />
+              <span class="text-xs font-mono text-sub group-hover:text-white transition-colors uppercase tracking-wider">
+                Atualizar automaticamente (1s)
+              </span>
+            </label>
+
+            <div class="text-[10px] font-mono text-sub uppercase tracking-widest">
+              STATUS: <span id="sync-state-text" class="text-mint">SINCRONIZADO</span>
+            </div>
+          </div>
+
+          <p id="error-message" class="error-banner" hidden role="alert"></p>
         </div>
       </section>
+    </div>
+  </header>
 
-      <section class="meta-grid" aria-label="Metadados da resposta">
-        <div class="meta-item">
-          <span class="meta-label">Fuso Horário</span>
-          <span id="fuso" class="meta-value">---</span>
+  <div class="tech-separator" aria-hidden="true"></div>
+
+  <!-- 5. FEATURE CARDS (METADADOS DA RESPOSTA) -->
+  <section id="metricas" class="py-16 md:py-24 relative bg-void" aria-label="Metadados da Data e Hora">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="mb-12 flex items-end justify-between reveal">
+        <div>
+          <div class="inline-block px-3 py-1 border border-border bg-white/5 rounded-full mb-4">
+            <span class="text-[10px] font-mono text-mint uppercase tracking-widest">Metadados da Resposta</span>
+          </div>
+          <h2 class="font-display text-3xl md:text-4xl font-semibold mb-2 tracking-tight text-white">Precisão &amp; Padronização</h2>
+          <p class="text-sub text-sm md:text-base max-w-md">
+            Dados retornados em tempo real pela rota <code class="text-mint font-mono text-xs">/api/datetime</code> no servidor Express.
+          </p>
         </div>
-        <div class="meta-item">
-          <span class="meta-label">ISO 8601 (UTC)</span>
-          <span id="iso" class="meta-value mono">---</span>
+        <div class="hidden md:block text-right">
+          <div class="font-mono text-[10px] text-mint">SYS_TIME_V2</div>
         </div>
-        <div class="meta-item">
-          <span class="meta-label">Timestamp (ms)</span>
-          <span id="timestamp" class="meta-value mono">---</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-0 border border-border">
+        <!-- Card 1: Fuso Horário -->
+        <article class="group border-b md:border-b-0 md:border-r border-border p-6 md:p-8 hover-card bg-panel reveal">
+          <div class="w-10 h-10 bg-void border border-border flex items-center justify-center mb-6 text-mint">
+            <iconify-icon icon="solar:global-linear" width="24" height="24"></iconify-icon>
+          </div>
+          <div class="text-[10px] font-mono text-sub uppercase tracking-widest mb-1">Fuso Horário</div>
+          <h3 id="fuso" class="font-display text-lg md:text-xl font-semibold mb-3 tracking-tight text-white break-words">
+            ---
+          </h3>
+          <p class="text-xs md:text-sm text-sub leading-relaxed">
+            Formatação localizada em <code class="text-white font-mono">pt-BR</code> via <code class="text-white font-mono">Intl.DateTimeFormat</code>.
+          </p>
+        </article>
+
+        <!-- Card 2: ISO 8601 -->
+        <article class="group border-b md:border-b-0 md:border-r border-border p-6 md:p-8 hover-card bg-panel reveal">
+          <div class="w-10 h-10 bg-void border border-border flex items-center justify-center mb-6 text-mint">
+            <iconify-icon icon="solar:shield-check-linear" width="24" height="24"></iconify-icon>
+          </div>
+          <div class="text-[10px] font-mono text-sub uppercase tracking-widest mb-1">ISO 8601 (UTC)</div>
+          <h3 id="iso" class="font-mono text-sm md:text-base font-semibold mb-3 text-mint break-all">
+            ---
+          </h3>
+          <p class="text-xs md:text-sm text-sub leading-relaxed">
+            Representação universal padronizada em UTC gerada no instante exato da requisição.
+          </p>
+        </article>
+
+        <!-- Card 3: Timestamp Unix -->
+        <article class="group border-b md:border-b-0 border-border p-6 md:p-8 hover-card bg-panel reveal">
+          <div class="w-10 h-10 bg-void border border-border flex items-center justify-center mb-6 text-mint">
+            <iconify-icon icon="solar:bolt-linear" width="24" height="24"></iconify-icon>
+          </div>
+          <div class="text-[10px] font-mono text-sub uppercase tracking-widest mb-1">Timestamp (ms)</div>
+          <h3 id="timestamp" class="font-mono text-xl md:text-2xl font-semibold mb-3 text-white">
+            ---
+          </h3>
+          <p class="text-xs md:text-sm text-sub leading-relaxed">
+            Milissegundos decorridos desde a época Unix (<code class="text-white font-mono">1970-01-01T00:00:00Z</code>).
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <div class="tech-separator" aria-hidden="true"></div>
+
+  <!-- 6. DATA DISPLAY: ANEL DE CICLO DIÁRIO + TELEMETRIA E PAYLOAD JSON -->
+  <section id="telemetria" class="grid grid-cols-1 lg:grid-cols-2 border-b border-border" aria-label="Telemetria e Payload JSON">
+    <!-- Coluna Esquerda: Anel SVG de Ciclo Diário -->
+    <div class="bg-panel p-8 md:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-center items-center relative overflow-hidden reveal">
+      <div class="inline-block px-3 py-1 border border-border bg-white/5 rounded-full mb-8">
+        <span class="text-[10px] font-mono text-mint uppercase tracking-widest">Ciclo Diário (24 Horas)</span>
+      </div>
+
+      <div class="relative w-56 h-56 md:w-64 md:h-64">
+        <svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
+          <circle cx="50" cy="50" r="45" stroke="#1a1a1a" stroke-width="8" fill="none"></circle>
+          <circle
+            id="day-ring"
+            cx="50"
+            cy="50"
+            r="45"
+            stroke="#00ffa3"
+            stroke-width="8"
+            fill="none"
+            stroke-dasharray="283"
+            stroke-dashoffset="283"
+            class="token-chart-ring"
+          ></circle>
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+          <span id="day-progress" class="text-3xl md:text-4xl font-semibold text-white font-mono">0%</span>
+          <span class="text-[10px] text-sub uppercase tracking-widest mt-1">Dia Decorrido</span>
         </div>
-      </section>
+      </div>
 
-      <section class="controls" aria-label="Controles da consulta">
-        <div class="endpoint-group">
-          <label for="api-url">URL do endpoint da API</label>
-          <input
-            id="api-url"
-            type="url"
-            placeholder="https://seu-servico.onrender.com/api/datetime"
-            autocomplete="off"
-          />
+      <div class="mt-10 grid grid-cols-3 gap-6 text-center w-full max-w-md">
+        <div class="p-3 bg-void border border-border">
+          <div id="unit-hours" class="text-xl md:text-2xl font-semibold text-white font-mono">--</div>
+          <div class="text-[10px] text-sub uppercase mt-1">Horas</div>
+        </div>
+        <div class="p-3 bg-void border border-border">
+          <div id="unit-minutes" class="text-xl md:text-2xl font-semibold text-mint font-mono">--</div>
+          <div class="text-[10px] text-sub uppercase mt-1">Minutos</div>
+        </div>
+        <div class="p-3 bg-void border border-border">
+          <div id="unit-seconds" class="text-xl md:text-2xl font-semibold text-white font-mono">--</div>
+          <div class="text-[10px] text-sub uppercase mt-1">Segundos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coluna Direita: Painel de Saúde da Rede & Resposta JSON Bruta -->
+    <div class="bg-void p-8 md:p-16 flex flex-col justify-center reveal">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="font-semibold text-white text-sm uppercase flex items-center gap-2 tracking-wider">
+          <span class="w-2 h-2 bg-mint rounded-sm"></span>
+          Telemetria &amp; Payload JSON
+        </h3>
+        <span class="font-mono text-[10px] text-mint">HTTP 200 OK</span>
+      </div>
+
+      <div class="space-y-3 mb-8">
+        <div class="flex justify-between items-center p-3 bg-panel border border-border">
+          <span class="text-xs text-sub">Data e Hora Formatada</span>
+          <span id="data-hora-completa" class="font-mono text-white text-xs md:text-sm font-semibold">---</span>
+        </div>
+        <div class="flex justify-between items-center p-3 bg-panel border border-border">
+          <span class="text-xs text-sub">Latência da Última Consulta</span>
+          <span id="latency-val" class="font-mono text-mint text-xs md:text-sm font-semibold">-- ms</span>
+        </div>
+        <div class="flex justify-between items-center p-3 bg-panel border border-border">
+          <span class="text-xs text-sub">Total de Consultas Realizadas</span>
+          <span id="req-count" class="font-mono text-white text-xs md:text-sm font-semibold">0</span>
+        </div>
+      </div>
+
+      <div class="border border-border bg-panel p-5">
+        <div class="flex items-center justify-between mb-3 pb-2 border-b border-border">
+          <span class="text-[10px] font-mono text-mint uppercase tracking-widest">&gt; Resposta JSON bruta da rota</span>
+          <span class="text-[10px] font-mono text-sub">application/json</span>
+        </div>
+        <pre id="json-output" class="font-mono text-xs text-gray-300 overflow-x-auto whitespace-pre-wrap break-words leading-relaxed">{}</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. SINGULARITY TUNNEL BAND -->
+  <section class="py-20 md:py-28 bg-panel relative overflow-hidden flex flex-col items-center justify-center min-h-[480px]" aria-label="Animação de Singularidade Digital">
+    <div class="absolute inset-0 opacity-10 bg-[url('assets/aetheris/singularity-bg.webp')] bg-cover bg-center"></div>
+
+    <div class="singularity-wrapper" aria-hidden="true">
+      <div class="tunnel-ring w-[100px] h-[100px]"></div>
+      <div class="tunnel-ring w-[200px] h-[200px]"></div>
+      <div class="tunnel-ring w-[300px] h-[300px]"></div>
+      <div class="tunnel-ring w-[400px] h-[400px]"></div>
+      <div class="tunnel-ring w-[500px] h-[500px]"></div>
+      <div class="tunnel-ring w-[600px] h-[600px]"></div>
+      <div class="tunnel-ring w-[700px] h-[700px]"></div>
+      <div class="tunnel-ring w-[800px] h-[800px]"></div>
+      <div class="tunnel-ring w-[900px] h-[900px]"></div>
+      <div class="tunnel-ring w-[1000px] h-[1000px]"></div>
+      <div class="tunnel-ring w-[1200px] h-[1200px]"></div>
+    </div>
+
+    <div class="relative z-10 text-center reveal pointer-events-none px-6">
+      <span class="text-mint font-mono text-[9px] md:text-[10px] tracking-[0.3em] md:tracking-[0.5em] uppercase bg-black/50 backdrop-blur-md px-4 py-1 rounded-full border border-mint/20">
+        Aetheris Design System
+      </span>
+      <h2 class="font-display text-4xl md:text-7xl font-bold mt-6 text-white mix-blend-difference tracking-tight uppercase">
+        TEMPO <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-mint">CONTÍNUO</span>
+      </h2>
+      <p class="text-gray-400 text-sm md:text-base max-w-md mx-auto mt-6 bg-black/30 backdrop-blur-sm p-4 rounded-lg border border-white/5">
+        Backend Express conectado ao Render com atualização contínua e interface construída sobre os tokens visuais Aetheris.
+      </p>
+    </div>
+  </section>
+
+  <div class="tech-separator" aria-hidden="true"></div>
+
+  <!-- 8. ARQUITETURA & ROADMAP DO PROJETO -->
+  <section id="arquitetura" class="py-16 md:py-24 bg-void" aria-label="Arquitetura do Projeto">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row gap-12 md:gap-16">
+        <div class="md:w-1/3 reveal">
+          <div class="inline-block px-3 py-1 border border-border bg-white/5 rounded-full mb-6">
+            <span class="text-[10px] font-mono text-mint uppercase tracking-widest">Pipeline Full-Stack</span>
+          </div>
+          <h2 class="font-display text-3xl md:text-4xl font-semibold mb-4 tracking-tight text-white">
+            Arquitetura<br />do Sistema
+          </h2>
+          <p class="text-sub text-sm md:text-base leading-relaxed mb-8">
+            Da definição da rota REST em Express até a publicação em nuvem no Render e integração visual com o Aetheris Design System.
+          </p>
         </div>
 
-        <div class="actions-row">
-          <button id="btn-fetch" type="button" class="btn-primary">
-            Consultar API Agora
-          </button>
+        <div class="md:w-2/3 space-y-0 relative border-l border-border ml-2 md:ml-0">
+          <div class="relative pl-8 md:pl-10 pb-10 reveal group">
+            <div class="absolute -left-[5px] top-2 w-2.5 h-2.5 bg-mint rounded-full shadow-[0_0_10px_#00ffa3]"></div>
+            <div class="border border-border bg-panel/50 p-6 hover:bg-panel transition-colors">
+              <div class="font-mono text-[10px] text-mint uppercase tracking-widest mb-1">FASE 01 — CONCLUÍDA</div>
+              <h3 class="font-semibold text-lg text-white mb-2">API Express &amp; Rota de Data e Hora</h3>
+              <p class="text-xs text-sub leading-relaxed">
+                Servidor Node.js com CORS habilitado e endpoints <code class="text-white font-mono">/api/datetime</code>, <code class="text-white font-mono">/datetime</code> e <code class="text-white font-mono">/api/data-hora</code>.
+              </p>
+            </div>
+          </div>
 
-          <label class="toggle-label" for="auto-refresh">
-            <input id="auto-refresh" type="checkbox" checked />
-            <span>Atualizar automaticamente (1s)</span>
-          </label>
+          <div class="relative pl-8 md:pl-10 pb-10 reveal group">
+            <div class="absolute -left-[5px] top-2 w-2.5 h-2.5 bg-mint rounded-full shadow-[0_0_10px_#00ffa3]"></div>
+            <div class="border border-border bg-panel/50 p-6 hover:bg-panel transition-colors">
+              <div class="font-mono text-[10px] text-mint uppercase tracking-widest mb-1">FASE 02 — CONCLUÍDA</div>
+              <h3 class="font-semibold text-lg text-white mb-2">Deploy Cloud no Render</h3>
+              <p class="text-xs text-sub leading-relaxed">
+                Conectado ao repositório GitHub com Blueprint <code class="text-white font-mono">render.yaml</code> e healthcheck em <code class="text-white font-mono">/health</code>.
+              </p>
+            </div>
+          </div>
+
+          <div class="relative pl-8 md:pl-10 reveal group">
+            <div class="absolute -left-[5px] top-2 w-2.5 h-2.5 bg-white border-2 border-void"></div>
+            <div class="absolute -left-[9px] top-1 w-4.5 h-4.5 border border-mint rounded-full animate-ping opacity-50"></div>
+            <div class="border border-mint/30 bg-mint/5 p-6 relative overflow-hidden">
+              <div class="flex justify-between items-start mb-2 relative z-10">
+                <span class="font-mono text-xs text-white">FASE 03 — EM OPERAÇÃO</span>
+                <span class="text-[9px] bg-mint text-void px-2 py-0.5 font-bold rounded">LIVE</span>
+              </div>
+              <h3 class="font-semibold text-lg text-white mb-2 relative z-10">Frontend Aetheris Design System</h3>
+              <p class="text-xs text-white/70 leading-relaxed">
+                Tipografia Inter &amp; JetBrains Mono, paleta Void/Mint, cards interativos, anel SVG de progresso diário e animações GSAP.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. FOOTER -->
+  <footer class="border-border reveal border-t pt-14 pb-10 bg-void">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div>
+          <div class="flex gap-2 mb-3 items-center">
+            <span class="w-2 h-2 bg-mint rounded-sm"></span>
+            <span class="text-lg font-medium text-white font-display">Aetheris // Chrono</span>
+          </div>
+          <p class="text-sub text-xs leading-relaxed max-w-xs">
+            Aplicação frontend consumindo a API Express de consulta de data e hora em tempo real.
+          </p>
         </div>
 
-        <p id="error-message" class="error-message" hidden role="alert"></p>
-      </section>
+        <div>
+          <h5 class="text-white font-medium text-sm mb-3">Endpoints da API</h5>
+          <ul class="space-y-2 text-xs font-mono text-sub">
+            <li><a href="/api/datetime" target="_blank" rel="noopener" class="hover:text-mint transition-colors">GET /api/datetime</a></li>
+            <li><a href="/api/data-hora" target="_blank" rel="noopener" class="hover:text-mint transition-colors">GET /api/data-hora</a></li>
+            <li><a href="/health" target="_blank" rel="noopener" class="hover:text-mint transition-colors">GET /health</a></li>
+          </ul>
+        </div>
 
-      <details class="json-details" open>
-        <summary>Resposta JSON bruta da rota</summary>
-        <pre id="json-output" class="json-output">{}</pre>
-      </details>
-    </section>
-  </main>
+        <div>
+          <h5 class="text-white font-medium text-sm mb-3">Design System</h5>
+          <p class="text-xs text-sub leading-relaxed">
+            Tokens: <code class="text-mint font-mono">#00ffa3</code> (Mint), <code class="text-white font-mono">#030303</code> (Void), <code class="text-white font-mono">#080808</code> (Panel), <code class="text-white font-mono">Inter</code> &amp; <code class="text-white font-mono">JetBrains Mono</code>.
+          </p>
+        </div>
+      </div>
 
+      <div class="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-border">
+        <p class="text-[10px] text-sub uppercase tracking-wider font-mono">
+          PROJETO FRONT EXPRESS &bull; SENAI
+        </p>
+        <div class="flex items-center gap-2 mt-4 md:mt-0">
+          <div class="w-1.5 h-1.5 rounded-full bg-mint shadow-[0_0_8px_rgba(102,224,163,0.8)] animate-pulse"></div>
+          <span class="font-mono text-[10px] text-mint uppercase tracking-widest">System Operational</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS DO DESIGN SYSTEM AETHERIS + APLICAÇÃO -->
+  <script src="assets/aetheris/iconify-solar.js"></script>
+  <script src="assets/aetheris/iconify-icon.min.js"></script>
+  <script src="assets/aetheris/gsap.min.js"></script>
+  <script src="assets/aetheris/ScrollTrigger.min.js"></script>
+  <script src="assets/aetheris/lenis.min.js"></script>
+  <script src="assets/aetheris/unicorn-scene.js"></script>
+  <script src="assets/aetheris/unicornStudio.umd.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
